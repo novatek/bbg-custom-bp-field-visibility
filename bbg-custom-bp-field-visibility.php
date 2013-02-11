@@ -38,26 +38,18 @@ class BBG_CPBV {
 	 * user doesn't pass the test (because he's not a Super Admin) then the field id gets
 	 * added to the list of hidden fields, which are then returned from the function.
 	 */
-	function define_hidden_fields( $hidden_fields, $displayed_user_id, $current_user_id ) {
-		// Get the displayed user's visibility settings
-		$user_visibility_levels = bp_get_user_meta( $displayed_user_id, 'bp_xprofile_visibility_levels', true );
-
-		// Loop through the user defined levels
-		foreach( (array)$user_visibility_levels as $field_id => $field_visibility ) {
-			
-			// We'll only be modifying those marked 'admins-only'
-			if ( 'admins-only' == $field_visibility ) {
-			
-				// 'Admins Only' fields are visible only to admins. So, if the
-				// current user is not an admin, add the field id to the list
-				// of hidden fields
-				if ( !is_super_admin( $current_user_id ) ) {
-					$hidden_fields[] = $field_id;
-				}
-			}
-		}
+     function define_hidden_fields( $hidden_fields, $displayed_user_id, $current_user_id ) {
 		
+		// Get the displayed user's visibility settings
+		//$user_visibility_levels = bp_get_user_meta( $displayed_user_id, 'bp_xprofile_visibility_levels', true );
+		$hidden_levels = array( 'admins-only' );
+		$res = bp_xprofile_get_fields_by_visibility_levels( $displayed_user_id, $hidden_levels );
+		if ( is_super_admin( $current_user_id ) ) {
+			$res = array();
+		}
+		$hidden_fields = array_merge((array)$hidden_fields, (array)$res);
 		return $hidden_fields;
+
 	}
 	
 	
